@@ -1,11 +1,14 @@
+import Particle from "./Particle.js";
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
-const dpr = window.devicePixelRatio > 1 ? 2 : 1;
+const dpr = 1 || window.devicePixelRatio;
 const fps = 60;
 let canvasWidth = innerWidth;
 let canvasHeight = innerHeight;
 
 const interval = 1000 / fps;
+
+const particles = [];
 
 function init() {
   canvasWidth = innerWidth;
@@ -15,6 +18,18 @@ function init() {
   canvas.width = canvasWidth * dpr;
   canvas.height = canvasHeight * dpr;
   ctx.scale(dpr, dpr);
+
+  confetti({
+    x: canvasWidth / 2,
+    y: canvasHeight / 2,
+    count: 10,
+  });
+}
+
+function confetti({ x, y, count }) {
+  for (let i = 0; i < count; i++) {
+    particles.push(new Particle(x, y));
+  }
 }
 
 function render() {
@@ -22,7 +37,7 @@ function render() {
   let then = Date.now();
 
   const x = innerWidth / 2;
-  const y = innerHeight / 2;
+  let y = innerHeight / 2;
   const width = 50;
   const height = 50;
 
@@ -38,6 +53,7 @@ function render() {
 
     widthAlpha += 0.1;
     deg += 0.1;
+    y += 1;
 
     ctx.translate(x + width, y + height);
     ctx.rotate(deg);
