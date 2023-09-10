@@ -1,10 +1,12 @@
 import Particle from "./Particle.js";
+import { randomNumBetween, hypotenuse } from "./utils.js";
 const canvas = document.querySelector("canvas");
 const ctx = canvas.getContext("2d");
-const dpr = 1 || window.devicePixelRatio;
-const fps = 60;
+const dpr = window.devicePixelRatio > 1 ? 2 : 1;
+
 let canvasWidth = innerWidth;
 let canvasHeight = innerHeight;
+const fps = 60;
 
 const interval = 1000 / fps;
 
@@ -13,36 +15,32 @@ const particles = [];
 function init() {
   canvasWidth = innerWidth;
   canvasHeight = innerHeight;
-  canvas.style.width = canvasWidth + "px";
-  canvas.style.height = canvasHeight + "px";
+  canvas.style.width = canvasWidth * dpr + "px";
+  canvas.style.height = canvasHeight * dpr + "px";
   canvas.width = canvasWidth * dpr;
   canvas.height = canvasHeight * dpr;
   ctx.scale(dpr, dpr);
 
-  confetti({
-    x: canvasWidth / 2,
-    y: canvasHeight / 2,
-    count: 10,
-  });
+  // confetti({
+  //   x: canvasWidth / 2,
+  //   y: canvasHeight / 2,
+  //   count: 10,
+  //   deg: -50,
+  // });
 }
 
-function confetti({ x, y, count }) {
+function confetti({ x, y, count, deg, colors, shapes, spread = 15 }) {
   for (let i = 0; i < count; i++) {
-    particles.push(new Particle(x, y));
+    // const r =
+    //   randomNumBetween(30, 100) * hypotenuse(innerWidth, innerHeight) * 0.0005;
+
+    particles.push(new Particle({ x, y, deg, colors, shapes, spread }));
   }
 }
 
 function render() {
   let now, delta;
   let then = Date.now();
-
-  const x = innerWidth / 2;
-  let y = innerHeight / 2;
-  const width = 50;
-  const height = 50;
-
-  let widthAlpha = 0;
-  let deg = 0.1;
 
   const frame = () => {
     requestAnimationFrame(frame);
@@ -51,32 +49,64 @@ function render() {
     if (delta < interval) return;
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    widthAlpha += 0.1;
-    deg += 0.1;
-    y += 1;
-
-    ctx.translate(x + width, y + height);
-    ctx.rotate(deg);
-    ctx.translate(-x - width, -y - height);
-
-    ctx.fillStyle = "red";
-    ctx.fillRect(
-      x,
-      y,
-      width * Math.cos(widthAlpha),
-      height * Math.sin(widthAlpha)
-    );
-
-    ctx.resetTransform();
-
+    for (let i = particles.length - 1; i >= 0; i--) {
+      particles[i].update();
+      particles[i].draw(ctx);
+      if (particles[i].opacity < 0) {
+        particles.splice(i, 1);
+      }
+    }
     then = now - (delta % interval);
   };
-
   requestAnimationFrame(frame);
 }
+
+const schoolParade = (x, y) => {
+  let now, delta;
+  let then = Date.now();
+
+  const frame = () => {
+    requestAnimationFrame(frame);
+    now = Date.now();
+    delta = now - then;
+    if (delta < interval) return;
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    confetti({
+      x: x,
+      y: y,
+      count: 10,
+      deg: -50,
+    });
+    confetti({
+      x: innerWidth - x,
+      y: y,
+      count: 10,
+      deg: -130,
+    });
+    for (let i = particles.length - 1; i >= 0; i--) {
+      particles[i].update();
+      particles[i].draw(ctx);
+      if (particles[i].opacity < 0) {
+        particles.splice(i, 1);
+      }
+    }
+    then = now - (delta % interval);
+  };
+  requestAnimationFrame(frame);
+};
 
 window.addEventListener("resize", init);
 window.addEventListener("load", () => {
   init();
   render();
+});
+window.addEventListener("click", (e) => {
+  // schoolParade(e.clientX, e.clientY);
+  confetti({
+    x: e.clientX,
+    y: e.clientY,
+    count: 10,
+    deg: -50,
+    // spread: 1,
+  });
 });
