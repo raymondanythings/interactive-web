@@ -9,7 +9,11 @@ class App {
   static width = 1024;
   static height = 768;
   constructor() {
-    this.background = new Background();
+    this.backgrounds = [
+      new Background({ img: document.querySelector("#bg3-img"), speed: 1 }),
+      new Background({ img: document.querySelector("#bg2-img"), speed: 2 }),
+      new Background({ img: document.querySelector("#bg1-img"), speed: 4 }),
+    ];
     this.resize();
     window.addEventListener("resize", () => {
       this.resize();
@@ -36,7 +40,10 @@ class App {
       delta = now - delta;
       if (delta < App.interval) return;
       App.ctx.clearRect(0, 0, App.width, App.height);
-      this.background.draw();
+      this.backgrounds.forEach((background) => {
+        background.update();
+        background.draw();
+      });
 
       then = now - (delta % App.interval);
     };
