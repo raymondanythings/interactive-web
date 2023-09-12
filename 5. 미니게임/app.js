@@ -1,6 +1,8 @@
+import Score from "./Score.js";
 import Wall from "./Wall.js";
 import Background from "./background.js";
 import Coin from "./coin.js";
+import GameHandler from "./gameHandler.js";
 import Player from "./player.js";
 
 class App {
@@ -18,25 +20,28 @@ class App {
       new Background({ img: document.querySelector("#bg1-img"), speed: 4 }),
     ];
 
+    this.gameHandler = new GameHandler(this);
+    window.addEventListener("resize", () => {
+      this.init();
+    });
+    this.reset();
+  }
+
+  reset() {
     this.coins = [];
 
     this.walls = [];
     this.player = new Player();
-    this.resize();
-    window.addEventListener("resize", () => {
-      this.resize();
-    });
+    this.score = new Score();
   }
 
-  resize() {
+  init() {
     App.canvas.width = App.width * App.dpr;
     App.canvas.height = App.height * App.dpr;
     App.ctx.scale(App.dpr, App.dpr);
-
-    const width =
-      innerWidth > innerHeight ? innerHeight * 0.9 : innerWidth * 0.9;
-    App.canvas.style.width = width + "px";
-    App.canvas.style.height = width * (3 / 4) + "px";
+    this.backgrounds.forEach((background) => {
+      background.draw();
+    });
   }
 
   render() {
@@ -46,7 +51,8 @@ class App {
       requestAnimationFrame(frame);
       now = Date.now();
       delta = now - then;
-      if (delta < App.interval) return;
+      if (this.gameHandler._status !== "PLAYING" || delta < App.interval)
+        return;
       App.ctx.clearRect(0, 0, App.width, App.height);
       this.backgrounds.forEach((background) => {
         background.update();
@@ -68,9 +74,8 @@ class App {
           }
 
           if (this.walls[i].isColliding(this.player.boundingBox)) {
-            this.player.boundingBox.color = `rgba(255, 0, 0, 0.3)`;
-          } else {
-            this.player.boundingBox.color = `rgba(0, 0, 255, 0.3)`;
+            this.gameHandler.status = "FINISHED";
+            break;
           }
         }
       } else {
@@ -79,12 +84,25 @@ class App {
       for (let j = this.coins.length - 1; j >= 0; j--) {
         this.coins[j].update();
         this.coins[j].draw();
-        if (this.coins[j].x + this.coins[j].width < 0) {
+        if (this.coins[j].boundingBox.isColliding(this.player.boundingBox)) {
+          this.coins.splice(j, 1);
+          this.score.coinCount++;
+        } else if (this.coins[j].x + this.coins[j].width < 0) {
           this.coins.splice(j, 1);
         }
       }
       this.player.update();
       this.player.draw();
+
+      if (
+        this.player.y >= App.height ||
+        this.player.y + this.player.height <= 0
+      ) {
+        this.gameHandler.status = "FINISHED";
+      }
+
+      this.score.update();
+      this.score.draw();
 
       then = now - (delta % App.interval);
     };
@@ -96,7 +114,7 @@ class App {
     });
     this.walls.push(newWall);
 
-    if (Math.random() < 0.5) {
+    if (Math.random() < 1) {
       const x = newWall.x + newWall.width / 2;
       const y = newWall.y2 - newWall.gapY / 2;
       this.coins.push(new Coin(x, y, newWall.vx));

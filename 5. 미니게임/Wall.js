@@ -15,7 +15,7 @@ class Wall {
         this.sx = this.img.width * (0 / 30);
         break;
     }
-    this.vx = -6;
+    this.vx = -15;
     this.width = App.height * this.sizeX;
     this.height = App.height;
     this.gapY = randomNumBetween(App.height * 0.3, App.height * 0.5);
@@ -83,8 +83,6 @@ class Wall {
       this.width,
       this.height
     );
-    this.boundingBox1.draw();
-    this.boundingBox2.draw();
   }
 }
 

@@ -21,7 +21,7 @@ class Player {
     );
 
     this.vy = -10;
-    this.gravity = 0.3;
+    this.gravity = 0.5;
     App.canvas.addEventListener("click", () => {
       this.vy += -5;
     });
@@ -52,7 +52,6 @@ class Player {
       this.width,
       this.height
     );
-    this.boundingBox.draw();
   }
 }
 
