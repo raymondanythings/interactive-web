@@ -6,15 +6,15 @@ class Background {
     this.height = App.height;
     this.width = App.height * (this.img.width / this.img.height);
     this.leftPose = { x: 0, y: 0 };
-    this.rightPost = { x: this.width - 4, y: 0 };
+    this.rightPost = { x: this.width - 2, y: 0 };
     this.speed = config.speed;
   }
   update() {
     if (this.leftPose.x + this.width < 0) {
-      this.leftPose.x = this.rightPost.x + this.width - 4;
+      this.leftPose.x = this.rightPost.x + this.width - 2;
     }
     if (this.rightPost.x + this.width < 0) {
-      this.rightPost.x = this.leftPose.x + this.width - 4;
+      this.rightPost.x = this.leftPose.x + this.width - 2;
     }
 
     this.leftPose.x -= this.speed;
