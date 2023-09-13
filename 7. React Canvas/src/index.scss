@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Fjalla+One&family=Noto+Sans+KR&display=swap');
+@import './reset.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-border: #938f87;
+    --color-bg: #c7c2b8;
+    --color-text: #1b1b19;
+
+    --border01: 1px solid var(--color-border);
+    --border02: 6px double var(--color-border);
+  }
+  html,
+  body {
+    @apply font-base bg-bg overflow-x-hidden leading-none;
+  }
+}
+
+
+
+@layer components {
+  .app {
+    @apply max-w-base ;
+    margin: 0 auto;
+    padding: 0 1rem;
+
+    .section {
+      @apply h-screen flex flex-col;
+      > header {
+        @apply h-32 flex justify-between box-border;
+        border-bottom : var(--border01);
+        > h1 {
+          @apply text-[5rem] flex items-end pb-2 font-bold;
+        }
+        > ul {
+          @apply flex gap-4 items-end text-[2rem] pb-2;
+        }
+      }
+      > main {
+        @apply grow py-4 flex;
+        > div {
+          @apply grow;
+          border : var(--border02);
+        }
+      }
+    }
+  
+    .content-title {
+      @apply bg-text text-white flex items-center justify-center -tracking-[0.5rem];
+      margin: 1rem 0;
+      padding: 2rem 0;
+      font-size: 9rem;
+    }
+  
+    .content-main {
+      @apply min-h-[50rem] flex;
+      border-top: var(--border01);
+      border-bottom: var(--border01);
+      > aside {
+        @apply w-2/5 flex flex-col justify-between;
+        border-right: var(--border01);
+        > div:first-child {
+          @apply text-[5rem] pt-[2rem] pr-0 pb-[2rem] pl-[1rem] -tracking-[0.2rem];
+        }
+        > div:last-child {
+          @apply flex justify-center items-center h-[10%] gap-8;
+          > img:nth-last-child(1) {
+            transform: scaleX(-1);
+          }
+        }
+      }
+      >article {
+        @apply w-3/5 text-[2rem] flex items-center leading-snug;
+        padding : 0 3rem;
+      }
+    }
+  
+  
+    .content-canvas{
+      @apply flex items-center justify-center gap-16 p-20; 
+      > canvas {
+        @apply w-[50vmin] h-[50vmin] rounded-[50%] shadow-[inset_0_0_5px_5px_rgba(0,0,0,0.2)] bg-[rgba(0,0,0,0.02)];
+      }
+      > aside {
+        @apply w-[50vmin];
+        > h1 {
+          font-size: 4rem;
+          margin-bottom: 0.5rem;
+        }
+        > h2 {
+          font-size: 3rem;
+          margin-bottom: 2rem;
+        }
+        > p {
+          font-size: 1.2rem;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+  footer {
+    @apply min-h-[75vh] bg-text text-white relative;
+    > .email {
+      @apply absolute text-[8vmin] bottom-8 right-8;
+    }
+  }
+}
