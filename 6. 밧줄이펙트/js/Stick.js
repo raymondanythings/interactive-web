@@ -8,7 +8,7 @@ export default class Stick extends Engine {
 
     this.length = this.startPoint.pos.distance(this.endPoint.pos);
 
-    this.tension = 0.5;
+    this.tension = 0.2;
   }
 
   update() {
@@ -37,7 +37,7 @@ export default class Stick extends Engine {
   draw() {
     this.ctx.beginPath();
     this.ctx.strokeStyle = "#999";
-    this.ctx.lineWidth = 10;
+    this.ctx.lineWidth = 1;
     this.ctx.moveTo(this.startPoint.pos.x, this.startPoint.pos.y);
     this.ctx.lineTo(this.endPoint.pos.x, this.endPoint.pos.y);
     this.ctx.stroke();

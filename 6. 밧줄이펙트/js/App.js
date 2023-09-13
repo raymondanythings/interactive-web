@@ -1,7 +1,6 @@
-import Dot from "./Dot.js";
-
-import Stick from "./Stick.js";
+import Rope from "./Rope.js";
 import Engine from "./core/Engine.js";
+import { randomNumberBetween } from "./utils.js";
 
 export default class App extends Engine {
   static width = innerWidth;
@@ -16,20 +15,22 @@ export default class App extends Engine {
     window.addEventListener("resize", () => {
       this.resize();
     });
-
-    this.dots = [
-      new Dot(200, 50),
-      new Dot(300, 100),
-      new Dot(300, 150),
-      new Dot(200, 50),
-    ];
-    this.sticks = [
-      new Stick(this.dots[0], this.dots[1]),
-      new Stick(this.dots[1], this.dots[2]),
-      new Stick(this.dots[2], this.dots[3]),
-    ];
-    this.dots[0].pinned = true;
   }
+
+  createRopes() {
+    this.ropes = [];
+    const TOTAL = App.width * 0.06;
+    for (let i = 0; i < TOTAL; i++) {
+      const rope = new Rope({
+        x: randomNumberBetween(App.width * 0.3, App.width * 0.7),
+        y: 0,
+        gap: randomNumberBetween(App.height * 0.05, App.height * 0.08),
+      });
+      rope.pin(0);
+      this.ropes.push(rope);
+    }
+  }
+
   resize() {
     App.width = innerWidth;
     App.height = innerHeight;
@@ -40,6 +41,7 @@ export default class App extends Engine {
     this.canvas.width = App.width * App.dpr;
     this.canvas.height = App.height * App.dpr;
     this.ctx.scale(App.dpr, App.dpr);
+    this.createRopes();
   }
 
   render() {
@@ -55,18 +57,11 @@ export default class App extends Engine {
 
       this.ctx.clearRect(0, 0, App.width, App.height);
 
-      this.dots.forEach((dot) => {
-        dot.update();
-      });
-      this.sticks.forEach((stick) => {
-        stick.update();
-      });
-      this.dots.forEach((dot) => {
-        dot.draw();
-      });
-      this.sticks.forEach((stick) => {
-        stick.draw();
-      });
+      for (let i = this.ropes.length - 1; i >= 0; i--) {
+        this.ropes[i].update();
+        this.ropes[i].draw();
+        if (this.ropes[i].isDisappeared) this.ropes.splice(i, 1);
+      }
     };
     requestAnimationFrame(frame);
   }
