@@ -1,23 +1,17 @@
-import { useState, createContext, PropsWithChildren } from 'react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 import RenderingEngine from '../modules/RenderingEngine'
-const rendererContext = createContext<{ renderer: RenderingEngine | null }>({
-  renderer: null,
-})
 
-interface RendererContextProps {
-  // canvas: HTMLCanvasElement | null
-}
-
-const Renderer = ({ children }: PropsWithChildren<RendererContextProps>) => {
-  console.log(children?.ref?.current, '<<children')
-  const [canvas, setCanvas] = useState(null)
-  return (
-    <rendererContext.Provider
-      value={{ renderer: canvas ? RenderingEngine.getInstance(canvas) : null }}
-    >
-      {children}
-    </rendererContext.Provider>
+const Renderer = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [renderingEngine, setRenderingEngine] = useState(
+    RenderingEngine.getInstance(canvasRef.current)
   )
+  useEffect(() => {
+    if (canvasRef.current) {
+      const engine = RenderingEngine.getInstance(canvasRef.current)
+    }
+  }, [renderingEngine])
+  return <canvas ref={canvasRef} />
 }
 
 export default Renderer
