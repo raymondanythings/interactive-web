@@ -81,23 +81,26 @@
   
   
     .content-canvas{
-      @apply flex items-center justify-center gap-16 p-20; 
-      > canvas {
-        @apply w-[50vmin] h-[50vmin] rounded-[50%] shadow-[inset_0_0_5px_5px_rgba(0,0,0,0.2)] bg-[rgba(0,0,0,0.02)];
-      }
-      > aside {
-        @apply w-[50vmin];
-        > h1 {
-          font-size: 4rem;
-          margin-bottom: 0.5rem;
+      .rotate-canvas-wrapper {
+
+        @apply flex items-center justify-center gap-16 p-20; 
+        > canvas {
+          @apply w-[50vmin] h-[50vmin] rounded-full  shadow-[inset_0_0_5px_5px_rgba(0,0,0,0.2)] bg-[rgba(0,0,0,0.02)];
         }
-        > h2 {
-          font-size: 3rem;
-          margin-bottom: 2rem;
-        }
-        > p {
-          font-size: 1.2rem;
-          line-height: 1.4;
+        > aside {
+          @apply w-[50vmin];
+          > h1 {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+          }
+          > h2 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+          }
+          > p {
+            font-size: 1.2rem;
+            line-height: 1.4;
+          }
         }
       }
     }

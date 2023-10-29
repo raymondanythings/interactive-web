@@ -1,4 +1,4 @@
-import { useRef, useEffect, PropsWithChildren } from 'react'
+import { useRef, useEffect, PropsWithChildren, useMemo } from 'react'
 import image1 from '../assets/nudake-1.jpg'
 import image2 from '../assets/nudake-2.jpg'
 import image3 from '../assets/nudake-3.jpg'
@@ -9,20 +9,24 @@ import {
   getScrupedPercent,
 } from '../utils/utils'
 import throttle from 'lodash/throttle'
+import { gsap } from 'gsap'
+
 const Nudake = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const imageSrcs = [image1, image2, image3]
+  const imageSrcs = useMemo(() => [image1, image2, image3], [])
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (canvas) {
       const canvasParent = canvas.parentElement
       const ctx = canvas.getContext('2d')
-      const loadedImages = []
+      const loadedImages: HTMLImageElement[] = []
 
       let currentIndex = 0
 
-      let prevPose = { x: 0, y: 0 }
+      let prevPose: { x: number; y: number } | null = { x: 0, y: 0 }
+
+      let isChanging = false
 
       const preloadImages = () =>
         new Promise<void>((resolve) => {
@@ -51,23 +55,33 @@ const Nudake = () => {
       }
 
       const drawImage = () => {
-        ctx?.clearRect(0, 0, canvasWidth, canvasHeight)
-        const image = new Image()
-        image.src = imageSrcs[currentIndex]
-        image.onload = () => {
-          if (ctx) {
-            ctx.globalCompositeOperation = 'source-over'
-            drawImageCenter(canvas, ctx, image)
-            const nextImage = imageSrcs[(currentIndex + 1) % imageSrcs.length]
-            if (canvasParent) {
-              canvasParent.style.backgroundImage = `url(${nextImage})`
+        isChanging = true
+        const image = loadedImages[currentIndex]
+
+        const isFirstDrawing = ctx?.globalCompositeOperation === 'source-over'
+
+        gsap.to(canvas, {
+          opacity: 0,
+          duration: isFirstDrawing ? 0 : 1,
+          onComplete: () => {
+            canvas.style.opacity = '1'
+            if (ctx) {
+              ctx.globalCompositeOperation = 'source-over'
+              drawImageCenter(canvas, ctx, image)
+              const nextImage = imageSrcs[(currentIndex + 1) % imageSrcs.length]
+              if (canvasParent) {
+                canvasParent.style.backgroundImage = `url(${nextImage})`
+              }
+              prevPose = null
+              isChanging = false
             }
-          }
-        }
+          },
+        })
       }
 
       const drawCircles = (e: MouseEvent) => {
         const nextPos = { x: e.offsetX, y: e.offsetY }
+        if (!prevPose) prevPose = nextPos
         const dist = getDistance(prevPose, nextPos)
         const angle = getAngle(prevPose, nextPos)
 
@@ -97,19 +111,19 @@ const Nudake = () => {
       }, 500)
 
       const onMouseMove = (e: MouseEvent) => {
+        if (isChanging) return
         drawCircles(e)
         checkPercent()
       }
 
       const onMouseDown = (e: MouseEvent) => {
-        console.log('omMouseDown')
+        if (isChanging) return
         canvas.addEventListener('mouseup', onMouseUp)
         canvas.addEventListener('mouseleave', onMouseUp)
         canvas.addEventListener('mousemove', onMouseMove)
         prevPose = { x: e.offsetX, y: e.offsetY }
       }
       const onMouseUp = () => {
-        console.log('omMouseUp')
         canvas.removeEventListener('mouseup', onMouseUp)
         canvas.removeEventListener('mouseleave', onMouseUp)
         canvas.removeEventListener('mousemove', onMouseMove)
@@ -125,9 +139,9 @@ const Nudake = () => {
         canvas.removeEventListener('mousedown', onMouseDown)
       }
     }
-  }, [])
+  }, [imageSrcs])
   return (
-    <div className="w-full h-full flex items-center justify-center relative border-2 border-solid border-red-500 bg-no-repeat bg-center bg-cover">
+    <div className="w-full h-full flex items-center justify-center relative  bg-no-repeat bg-center bg-cover">
       <canvas ref={canvasRef}></canvas>
     </div>
   )
