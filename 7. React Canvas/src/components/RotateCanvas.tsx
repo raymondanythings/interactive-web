@@ -76,9 +76,6 @@ const RotateCanvas = () => {
 
     Composite.add(engine.world, mouseConstraint)
 
-    canvas.removeEventListener('mousewheel', mouse.mousewheel)
-    canvas.removeEventListener('DOMMouseScroll', mouse.mousewheel)
-
     return {
       mouse,
       mouseConstraint,
@@ -343,7 +340,7 @@ const RotateCanvas = () => {
         engine.gravity.x = gravityPower * Math.cos((Math.PI / 180) * gravityDeg)
         engine.gravity.y = gravityPower * Math.sin((Math.PI / 180) * gravityDeg)
       })
-      canvas.addEventListener('mousewheel', () =>
+      canvas.addEventListener('wheel', () =>
         addRect({
           x: mouse.position.x,
           y: mouse.position.y,
@@ -353,7 +350,7 @@ const RotateCanvas = () => {
         })
       )
       return () => {
-        canvas.removeEventListener('mousewheel', () =>
+        canvas.removeEventListener('wheel', () =>
           addRect({
             x: mouse.position.x,
             y: mouse.position.y,
